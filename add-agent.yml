@@ -1,0 +1,8 @@
+---
+  - hosts: ossec_agents
+    tasks:
+    - name: Connect to ossec server
+      shell: /var/ossec/bin/agent-auth -m {{ ossec_server }} -p 1515
+
+    - name: Start ossec agent
+      shell: /var/ossec/bin/ossec-control start

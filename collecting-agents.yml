@@ -1,0 +1,8 @@
+---
+  - hosts: ossec_server
+    tasks:
+    - name: Start ossec-authd (waiting 60s for comunication from agents)
+      shell: timeout 60 /var/ossec/bin/ossec-authd -p 1515 -f -n | exit 0
+
+    - name: Start ossec server
+      shell: /var/ossec/bin/ossec-control start

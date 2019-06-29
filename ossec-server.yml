@@ -1,0 +1,34 @@
+---
+  - hosts: ossec_server
+    tasks:
+    - name: Installing packages
+      apt:
+        name:
+        - build-essential
+        - gcc
+        - make
+        - libtcl8.6
+        - tcl8.6
+        - tcl-expect
+        - mysql-common
+        - libmysqlclient20
+        - expect
+
+    - name: Download deb
+      get_url:
+        url: https://updates.atomicorp.com/channels/ossec/ubuntu/pool/main/o/ossec-hids-server/ossec-hids-server_3.3.0-6515bionic_amd64.deb
+        dest: /tmp/
+
+    - name: Install deb from /tmp/
+      apt: deb="/tmp/ossec-hids-server_3.3.0-6515bionic_amd64.deb"
+
+    - name: Template a file to /etc/files.conf
+      template:
+        src: templates/server/ossec.conf
+        dest: /var/ossec/etc/ossec.conf
+        owner: root
+        group: ossec
+        mode: '0660'
+
+    - name: Create certs
+      shell: openssl genrsa -out /var/ossec/etc/sslmanager.key 2048 && openssl req -new -x509 -key /var/ossec/etc/sslmanager.key -out /var/ossec/etc/sslmanager.cert -days 365 -subj "/C=US/ST=Denial/L=Springfield/O=Dis/CN=www.example.com"

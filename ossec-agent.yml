@@ -1,0 +1,33 @@
+---
+  - hosts: ossec_agents
+    tasks:
+    - name: Installing packages
+      apt:
+        name:
+        - expect
+        - libpcre2-8-0
+        - libtcl8.6
+        - tcl-expect
+        - tcl8.6
+
+    - name: Download deb
+      get_url:
+        url: https://updates.atomicorp.com/channels/ossec/ubuntu/pool/main/o/ossec-hids-agent/ossec-hids-agent_3.3.0-6515bionic_amd64.deb
+        dest: /tmp/
+
+    - name: Install deb from /tmp/
+      apt: deb="/tmp/ossec-hids-agent_3.3.0-6515bionic_amd64.deb"
+
+    - name: Template a file to /etc/files.conf
+      template:
+        src: templates/agents/ossec.conf
+        dest: /var/ossec/etc/ossec.conf
+        owner: root
+        group: ossec
+        mode: '0660'
+
+    - name: Replace server ip
+      replace:
+        path: /var/ossec/etc/ossec.conf
+        regexp: OSSEC_SERVER
+        replace: {{ ossec_server }}
